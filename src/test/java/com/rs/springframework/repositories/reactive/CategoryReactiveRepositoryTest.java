@@ -32,7 +32,6 @@ public class CategoryReactiveRepositoryTest {
         category.setDescription("Foo");
 
         categoryReactiveRepository.save(category).block();
-
         Long count = categoryReactiveRepository.count().block();
 
         assertEquals(Long.valueOf(1L), count);
