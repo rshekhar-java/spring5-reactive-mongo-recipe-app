@@ -57,7 +57,6 @@ public class IngredientController {
 
         //need to retrun back parent id for hidden from property
         IngredientCommand ingredientCommand = new IngredientCommand();
-        ingredientCommand.setRecipeId(recipeId);
         model.addAttribute("ingredient",ingredientCommand);
 
         //init uom
