@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @RunWith(SpringRunner.class)
 @DataMongoTest
-//@Ignore
+@Ignore
 public class UnitOfMeasureRepositoryIT {
 
     @Autowired
