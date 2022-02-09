@@ -2,10 +2,12 @@ package com.rs.springframework.services;
 
 import com.rs.springframework.domain.Recipe;
 import com.rs.springframework.repositories.RecipeRepository;
+import com.rs.springframework.repositories.reactive.RecipeReactiveRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
@@ -16,35 +18,35 @@ import java.io.IOException;
 @Service
 public class ImageServiceImpl implements ImageService {
 
-    private final RecipeRepository recipeRepository;
+    private final RecipeReactiveRepository recipeReactiveRepository;
 
-    public ImageServiceImpl(RecipeRepository recipeRepository) {
-        this.recipeRepository = recipeRepository;
+    public ImageServiceImpl(RecipeReactiveRepository recipeReactiveRepository) {
+        this.recipeReactiveRepository = recipeReactiveRepository;
     }
 
     @Override
-    @Transactional
-    public void saveImageFile(String recipeId, MultipartFile file) {
+    public Mono<Void> saveImageFile(String recipeId, MultipartFile file) {
 
-        try {
-            Recipe recipe = recipeRepository.findById(recipeId).get();
+        Mono<Recipe> recipeMono = recipeReactiveRepository.findById(recipeId)
+                .map(recipe -> {
+                    Byte[] byteObjects = new Byte[0];
+                    try {
+                        byteObjects = new Byte[file.getBytes().length];
+                        int i = 0;
 
-            Byte[] byteObjects = new Byte[file.getBytes().length];
-
-            int i =0;
-            for (byte b : file.getBytes()){
-                byteObjects[i++] =b;
-            }
-
-            recipe.setImage(byteObjects);
-            recipeRepository.save(recipe);
-            log.debug("Received a file in DB");
-
-        } catch (IOException e) {
-            //todo handler
-            log.error("Error Occured Saving image",e);
-            e.printStackTrace();
-        }
-
+                        for (byte b : file.getBytes()) {
+                            byteObjects[i++] = b;
+                        }
+                        recipe.setImage(byteObjects);
+                        return recipe;
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException(e);
+                    }
+                });
+        recipeReactiveRepository.save(recipeMono.block()).block();
+        log.debug("Received a file in DB");
+        return Mono.empty();
     }
 }

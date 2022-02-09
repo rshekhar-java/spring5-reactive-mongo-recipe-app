@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ImageControllerTest {
 
     @Mock
-    ImageService imageServcie;
+    ImageService imageService;
 
     @Mock
     RecipeService recipeService;
@@ -38,7 +38,7 @@ public class ImageControllerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        controller= new ImageController(imageServcie,recipeService);
+        controller= new ImageController(imageService,recipeService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new ControllerExceptionHandler())
                 .build();
@@ -67,11 +67,13 @@ public class ImageControllerTest {
                 "testing.txt","text/plain",
                 "COM RS ".getBytes());
 
+        when(imageService.saveImageFile(anyString(), any())).thenReturn(Mono.empty());
+
         mockMvc.perform(multipart("/recipe/1/image").file(multipartFile))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location","/recipe/1/show"));
 
-        verify(imageServcie,times(1)).saveImageFile(anyString(),any());
+        verify(imageService,times(1)).saveImageFile(anyString(),any());
     }
 
     @Test

@@ -53,7 +53,7 @@ public class IngredientServiceImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
          ingredientService = new IngredientServiceImpl(ingredientToIngredientCommand,
-                 ingredientCommandToIngredient,recipeRepository,recipeReactiveRepository,
+                 ingredientCommandToIngredient,recipeReactiveRepository,
                  unitOfMeasureReactiveRepository);
     }
 
